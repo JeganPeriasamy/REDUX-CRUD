@@ -78,3 +78,20 @@ export default usersSlice.reducer
   useEffect(() => {
     dispatch(getUsers())
   }, [dispatch]);
+const SET_INPUT2 = 'SET_INPUT2';
+
+export const setInput2 = (value) => ({
+  type: SET_INPUT2,
+  payload: value,
+});
+
+const input2Reducer = (state = '', action) => {
+  switch (action.type) {
+    case SET_INPUT2:
+      return action.payload;
+    default:
+      return state;
+  }
+};
+
+export default input2Reducer;
