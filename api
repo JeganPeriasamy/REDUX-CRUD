@@ -1,0 +1,80 @@
+import {createSlice,createAsyncThunk} from "@reduxjs/toolkit"
+
+const initialState ={
+    BioData: [],
+    selectedData:{},
+    isLoading:false,
+    error:"",
+
+}
+
+//GET
+export const get = createAsyncThunk(
+    "users/get", //type
+    ()=>{
+    async (_,{rejectWithValue})=>{
+        const response = await fetch ("http://localhost:8000/users")
+        if(response.ok){
+            const jsonResponse = await response.json()
+            return jsonResponse
+        }
+        else{
+            return rejectWithValue({error:"No User"})
+        }
+    }
+    }
+)
+
+const usersSlice = createSlice({
+    name:"bio",
+    initialState,
+    reducers:{
+        add:(state,action)=>{
+            const id = Math.random() * 100
+            const user = {...action.payload,id}
+            state.BioData.push(user)
+        },
+        remove:(state,action)=>{
+           state.BioData = state.BioData.filter((user)=>user.id !== action.payload.id)
+        },
+        update:(state,action)=>{
+            state.BioData = state.BioData.map((user)=>user.id === action.payload.id ? action.payload : user )
+        },
+        setSelected:(state,action)=>{
+                state.selectedData = action.payload
+        }
+
+    },
+    extraReducers:(builder) =>{
+        builder
+            .addCase(getUsers.pending,(state)=>{
+                state.isLoading = true
+            })
+            .addCase(getUsers.fulfilled,(state,action)=>{
+                state.isLoading = false
+                state.error =""
+                state.BioData = action.payload
+            })
+            .addCase(getUsers.rejected,(state,action)=>{
+                state.isLoading = false
+                state.error = action.payload.error
+                state.BioData = []
+            })
+    }
+})
+
+ 
+export const {add,remove,update,setSelected,getUsers} = usersSlice.actions
+
+export default usersSlice.reducer
+// Action has payload, where payload is the data(name,email,id)
+
+
+
+
+
+
+//
+  useEffect(() => {
+    dispatch(getUsers())
+  }, [dispatch]);
